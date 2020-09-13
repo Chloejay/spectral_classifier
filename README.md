@@ -1,3 +1,5 @@
+## spectral_classifier
+
 This repo is used to demo the feature engineering task for a data job interview.
 
 #### Data source 
