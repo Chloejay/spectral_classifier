@@ -9,10 +9,8 @@ Chemical Spectra and near-infrared spectroscopy data sets in Tobacco industry.
 
 
 #### Experiments, typical for classification modeling
-- Find peaks of spectrum 
-- PCA 
-- SVM 
-- KNN 
+- Find peaks of spectrum/ PCA /KNN, for components of some samples are overlap, so PCA is not a good option
+- SVM(after experiments and random checking, SVM has better performance)
 - CNN for deep feature extraction, input: spectrogram(TODO)
 
 after training I found my model is blind fool me, should return back to pre-processing of near-infrared (NIR) spectral data, for chemometrics modelling processing data is critical for model. 
