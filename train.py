@@ -120,12 +120,12 @@ class Processor:
 class Classifier:
     def svm(self, train_data, test_data, train_y):
         cls = svm.SVC(kernel="linear")
-        #train the model
+        #train
         train_data.fillna("0", inplace= True)
         train_y.fillna("0", inplace= True)
         
         cls.fit(train_data, train_y)
-        #predict the response
+        #predict
         pred = cls.predict(test_data)
         return pred 
 
