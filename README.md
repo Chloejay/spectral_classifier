@@ -1,6 +1,6 @@
 ## spectral_classifier
 
-This repo is used to demo the feature engineering task for a data job interview.
+This repo is used to demo the feature engineering task for a data interview.
 
 #### Data source 
 Chemical Spectra and near-infrared spectroscopy data sets in Tobacco industry. 
@@ -10,13 +10,13 @@ Chemical Spectra and near-infrared spectroscopy data sets in Tobacco industry.
 
 #### Experiments, typical for classification modeling
 - Find peaks of spectrum 
-- supervised linear regression 
 - PCA 
 - SVM 
 - KNN 
-- CNN for deep feature extraction
+- CNN for deep feature extraction, input: spectrogram(TODO)
 
-**(for time limited, I only start this task from this Sunday afternoon, so much research work and code refactor is under the progress in limited deadline.)**
+after training I found my model is blind fool me, should return back to pre-processing of near-infrared (NIR) spectral data, for chemometrics modelling processing data is critical for model. 
+**(for time limited, I only start this task from this Sunday afternoon, much research work and code refactor is under the progress in limited deadline.)**
 
 
 ###### Sample wavelength of Absorbance(AU).
@@ -26,4 +26,5 @@ Chemical Spectra and near-infrared spectroscopy data sets in Tobacco industry.
 - <a href="https://www.hindawi.com/journals/jamc/2020/9652470/">Classification Modeling Method for Near-Infrared Spectroscopy of Tobacco Based on Multimodal Convolution Neural Networks</a>
 - <a href="https://www.researchgate.net/publication/226296679_A_Machine_Learning_Application_for_Classification_of_Chemical_Spectra">A Machine Learning Application for Classification of Chemical Spectra</a>
 - <a href="https://arxiv.org/pdf/1707.08908.pdf">Deep Learning Models for Wireless Signal Classification with Distributed Low-Cost Spectrum Sensors</a>
-
+- <a href="https://www.researchgate.net/publication/294138311_Model-based_pre-processing_in_Raman_spectroscopy_of_biological_samples">Model-based pre-processing in Raman spectroscopy of biological samples</a>
+- <a href="https://wis.kuleuven.be/stat/robust/papers/2012/VerbovenHubertGoos-revision.pdf">Robust preprocessing and model selection for spectral data</a>

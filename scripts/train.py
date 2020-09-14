@@ -3,7 +3,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
 import os
-import tqdm
+from tqdm import tqdm
 import time
 import logging 
 
@@ -14,8 +14,10 @@ from sklearn.linear_model import Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_selection import SelectFromModel
 
-# pre-processing 
 
+#************************************
+# pre-processing 
+#************************************
 
 
 # baseline model 
