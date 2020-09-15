@@ -7,6 +7,7 @@ from tqdm import tqdm
 import time
 import logging 
 import spectrum
+from typing import List, Tuple, Iterable, Any, Callable, Optional
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -33,6 +34,7 @@ class Processor:
         self.chemical_path = chemical_path
         self.task_path = task_path
         self.file_number= file_number 
+        self.root_train_path= os.path.join(base_path, f"{task_path}{str(file_number)}")
         self.train_folder= os.path.join(base_path, f"{task_path}{str(file_number)}", train_data_path)
         self.test_folder= os.path.join(base_path, f"{task_path}{str(file_number)}", test_data_path)
 
@@ -40,7 +42,6 @@ class Processor:
         spectrum_list= list()
         file_number = list()
 
-        
         for file in os.listdir(self.train_folder):
             try:
                 data = pd.read_csv(os.path.join(self.train_folder, file),
@@ -57,17 +58,17 @@ class Processor:
             
         return pd.DataFrame({"file_number":file_number, "spectrum_data": spectrum_list})
 
-    def get_chemicals(self, col1= None, col2= None)-> pd.DataFrame:
-        data = pd.read_excel(os.path.join(self.base_path, f"{self.task_path}{str(self.file_number)}", self.chemical_path))
+    def get_chemicals(self, col1= None, col2= None)-> Optional[pd.DataFrame]:
+        data = pd.read_excel(os.path.join(self.root_train_path, self.chemical_path))
         
         if (col1 is None and col2 is None):
             return data
         return data[[col1, col2]]
 
-    #display graph for wavelength and intensity value; 
+    # display graph: axis_x: wavelength, axis_y: intensity value; 
     def plot_spectrum(self, flatten_file: pd.DataFrame)-> None:
-        
         plt.figure(figsize=(8, 6), dpi=100)
+        
         for i in range(len(flatten_file.index)):
             plt.xlabel("Wavelength") #波长
             plt.ylabel("Absorbance (AU)") #吸光度
@@ -75,10 +76,11 @@ class Processor:
             plt.grid(True)
             plt.tight_layout()
             
-    #reprocess data to row to apply SVM model
-    def flatten2row(self, path)-> pd.DataFrame:
+    # reprocess data to flatten in row for applying SVM model
+    def flatten2row(self, path: str)-> Tuple[pd.DataFrame, Any]:
         spectrum_data= list()
         file_name = list()
+        
         for file in os.listdir(path):
             try:
                 data = (pd.read_csv(os.path.join(path,file),
@@ -93,22 +95,24 @@ class Processor:
             
         return pd.DataFrame(spectrum_data), file_name
 
-    def get_traintest(self, traintest):
+    def get_traintest(self, traintest: str)-> pd.DataFrame:
         if traintest == "TRAIN":
             return self.flatten2row(self.train_folder)
         
         return self.flatten2row(self.test_folder)
 
-    
-    def merge_df(self, unique_col, col1= None, col2= None):
-        #add sample_number column to match with chemical file
+    # merge training data with chemical reference table
+    def merge_df(self, unique_col: str, col1= None, col2= None)-> pd.DataFrame:
+        
+        # add sample_number column to match with name of chemical reference table
         train_data, file_name = self.get_traintest("TRAIN") 
         train_data[unique_col]= file_name
         train_data[unique_col]= train_data[unique_col].apply(lambda x: int(x))
+        
         if col1 is None and col2 is None:
-            final_full_df= self.get_chemicals().merge(train_data, on=unique_col, how= "left")
+            final_full_df = self.get_chemicals().merge(train_data, on=unique_col, how= "left")
             
-        chemicals_file= self.get_chemicals(col1, col2).rename(columns={col1:unique_col})
+        chemicals_file= self.get_chemicals(col1, col2).rename(columns= {col1:unique_col})
         chemicals_file[unique_col]= chemicals_file[unique_col].apply(lambda x: int(str(x).split("-")[-1]))
         final_full_df= chemicals_file.merge(train_data, on=unique_col, how= "left")
 
@@ -118,21 +122,21 @@ class Processor:
 # baseline model - SVM
 #************************************
 class Classifier:
-    def svm(self, train_data, test_data, train_y):
+    def svm(self, train_data: pd.DataFrame, test_data: pd.DataFrame, train_y: Any)-> Any: # haven't found type hint for series type in mypy. 
         cls = svm.SVC(kernel="linear")
-        #train
+        # train
         train_data.fillna("0", inplace= True)
         train_y.fillna("0", inplace= True)
         
         cls.fit(train_data, train_y)
-        #predict
+        # predict
         pred = cls.predict(test_data)
         return pred 
 
     def knn(self):
         pass 
 
-# no model inference, no ground truth label provided
+# no model inference yet.
 
 
 
@@ -157,22 +161,15 @@ if __name__ == "__main__":
     pred= model.svm(train_x, test_data, train_y)
     pred2= model.svm(train_x, test_data, train_y_2)
     pd.DataFrame({"等级预测":pred}).to_csv("predication/task1_pred.csv", index= False)
-    # pred2
 
-    #************************************
     ## pred for task 2
     
-    #************************************
     ## pred for task 3 
-    
     processor3 = Processor(BASE_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH, CHEMICAL_EXCEL_PATH, TASK_PATH, 3)
     train_data3, file_name3 = processor3.get_traintest("TRAIN")
     test_data3, _= processor3.get_traintest("TEST")
-    #merge
     merge_df3= processor3.merge_df("样本序号", "Sample", "化学值")
     train_x_3= merge_df3.iloc[:, 2:]
     train_y_3= merge_df3["样本序号"]
     pred3= model.svm(train_x_3, test_data3, train_y_3)
     pd.DataFrame({"样本序号预测": pred3}).to_csv("predication/task3_pred.csv", index= False)
-
-    
